@@ -1,6 +1,5 @@
-﻿using Azure;
-using ChatBotAPI.Models;
-using Microsoft.AspNetCore.Http;
+﻿using ChatBotAPI.Models;
+using ChatBotAPI.Models.RequestModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
