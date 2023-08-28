@@ -18,7 +18,6 @@ namespace ChatBotAPI.Controllers
             this._context = context;
         }
 
-        // GET: api/<TasksController>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -26,7 +25,6 @@ namespace ChatBotAPI.Controllers
             return Ok(new { Status = "Success", Data = Tasks, Message = "Tasks retreived created successfully!" });
         }
 
-        // GET api/<TasksController>/5
         [HttpGet("{id}")]
         [ActionName("GetByID")]
         public async Task<IActionResult> GetByID(int id)
@@ -54,7 +52,6 @@ namespace ChatBotAPI.Controllers
         ///
         /// </remarks>
         /// 
-        // POST api/<TasksController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] TaskItemRequest model)
         {
@@ -78,7 +75,6 @@ namespace ChatBotAPI.Controllers
             return Ok(new { Status = "Success", Data = task.id, Message = "Task Created !" });
         }
 
-        // PUT api/<TasksController>/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int? id, [FromBody] TaskItemRequest model)
         {
@@ -102,7 +98,6 @@ namespace ChatBotAPI.Controllers
             return NotFound(new { Status = "Failed", Message = "Task Not Found" });
         }
 
-        // DELETE api/<TasksController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int? id)
         {
