@@ -24,6 +24,10 @@ namespace ChatBotAPI.Controllers
             _configuration = configuration;
         }
 
+        ///{
+        ///     "username": "Shees_ali",
+        ///     "password": "Test@1234"
+        ///}
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -76,9 +80,9 @@ namespace ChatBotAPI.Controllers
             };
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new  { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
-            return Ok(new  { Status = "Success", Message = "User created successfully!" });
+            return Ok(new { Status = "Success", Message = "User created successfully!" });
         }
 
         [HttpPost]
