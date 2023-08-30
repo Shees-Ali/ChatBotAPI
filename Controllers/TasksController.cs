@@ -1,8 +1,10 @@
 ﻿using ChatBotAPI.Models;
 using ChatBotAPI.Models.RequestModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ChatBotAPI.Controllers
 {
@@ -12,16 +14,20 @@ namespace ChatBotAPI.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> userManager1;
 
-        public TasksController(ApplicationDbContext context)
+        public TasksController(ApplicationDbContext context, UserManager<IdentityUser> userManager1)
         {
+            this.userManager1 = userManager1;
             this._context = context;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var Tasks = await _context.Tasks.ToListAsync();
+            ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
+            var _user = await userManager1.FindByNameAsync(principal.Identity?.Name);
+            var Tasks = await _context.Tasks.Where(e => e.User.UserName == _user.UserName).Include(e => e.User).ToListAsync();
             return Ok(new { Status = "Success", Data = Tasks, Message = "Tasks retreived created successfully!" });
         }
 
@@ -59,7 +65,8 @@ namespace ChatBotAPI.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "Task Creation Failed!." });
             }
-
+            ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
+            var _user = await userManager1.FindByNameAsync(principal.Identity?.Name);
             var task = new TaskItem()
             {
                 TaskName = model.TaskName,
@@ -69,6 +76,7 @@ namespace ChatBotAPI.Controllers
                 TaskTags = model.TaskTags,
                 TaskType = model.TaskType,
                 CreatedAt = DateTime.Now,
+                User = _user
             };
             await _context.Tasks.AddAsync(task);
             await _context.SaveChangesAsync();

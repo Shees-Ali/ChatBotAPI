@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChatBotAPI.Models
 {
@@ -13,6 +14,6 @@ namespace ChatBotAPI.Models
         public string TaskTags { get; set;} = string.Empty;
         public string TaskDate { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
-
+        public IdentityUser? User { get; set; }
     }
 }
