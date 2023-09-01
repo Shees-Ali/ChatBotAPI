@@ -17,7 +17,7 @@ namespace ChatBotAPI.Controllers
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthenticationController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthenticationController([FromServices] UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, [FromServices] IConfiguration configuration)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;

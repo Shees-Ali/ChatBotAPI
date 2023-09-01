@@ -14,11 +14,11 @@ namespace ChatBotAPI.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> userManager1;
+        private readonly UserManager<IdentityUser> userManager;
 
-        public TasksController(ApplicationDbContext context, UserManager<IdentityUser> userManager1)
+        public TasksController(ApplicationDbContext context,[FromServices] UserManager<IdentityUser> userManager)
         {
-            this.userManager1 = userManager1;
+            this.userManager = userManager;
             this._context = context;
         }
 
@@ -26,7 +26,7 @@ namespace ChatBotAPI.Controllers
         public async Task<IActionResult> Get()
         {
             ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
-            var _user = await userManager1.FindByNameAsync(principal.Identity?.Name);
+            var _user = await userManager.FindByNameAsync(principal.Identity?.Name);
             var Tasks = await _context.Tasks.Where(e => e.User.UserName == _user.UserName).Include(e => e.User).ToListAsync();
             return Ok(new { Status = "Success", Data = Tasks, Message = "Tasks retreived created successfully!" });
         }
@@ -66,7 +66,7 @@ namespace ChatBotAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "Task Creation Failed!." });
             }
             ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
-            var _user = await userManager1.FindByNameAsync(principal.Identity?.Name);
+            var _user = await userManager.FindByNameAsync(principal.Identity?.Name);
             var task = new TaskItem()
             {
                 TaskName = model.TaskName,

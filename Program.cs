@@ -1,3 +1,4 @@
+using ChatBotAPI.Controllers;
 using ChatBotAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var Configuration = builder.Configuration;
+
+// Init required Services
+builder.Services.AddSingleton<IConfiguration>(Configuration);
+builder.Services.AddScoped<UserManager<IdentityUser>>();
+builder.Services.AddTransient<ChatbotController>();
+builder.Services.AddTransient<AuthenticationController>();
 
 // Init the Database Service
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
