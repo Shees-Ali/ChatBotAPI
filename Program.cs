@@ -10,6 +10,17 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var Configuration = builder.Configuration;
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                      });
+});
 
 // Init required Services
 builder.Services.AddSingleton<IConfiguration>(Configuration);
@@ -83,6 +94,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -96,6 +108,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
 

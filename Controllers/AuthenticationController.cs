@@ -116,5 +116,18 @@ namespace ChatBotAPI.Controllers
             return Ok(new { Status = "Success", Message = "User created successfully!" });
 
         }
+
+        [HttpGet]
+        [Route("get-current-user")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
+            if (principal.Identity?.Name != null)
+            {
+                var _user = await userManager.FindByNameAsync(principal.Identity?.Name);
+                return Ok(new { Status = "Success", User = _user });
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User Not Logged In!" });
+        }
     }
 }

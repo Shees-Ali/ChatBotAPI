@@ -16,19 +16,55 @@ namespace ChatBotAPI.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> userManager;
 
-        public TasksController(ApplicationDbContext context,[FromServices] UserManager<IdentityUser> userManager)
+        public TasksController(ApplicationDbContext context, [FromServices] UserManager<IdentityUser> userManager)
         {
             this.userManager = userManager;
             this._context = context;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(
+        [FromQuery] string sortBy = "",
+        [FromQuery] string order = "",
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null)
         {
             ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
             var _user = await userManager.FindByNameAsync(principal.Identity?.Name);
-            var Tasks = await _context.Tasks.Where(e => e.User.UserName == _user.UserName).Include(e => e.User).ToListAsync();
-            return Ok(new { Status = "Success", Data = Tasks, Message = "Tasks retreived created successfully!" });
+            var query = _context.Tasks.Where(e => e.User.UserName == _user.UserName).Include(e => e.User).AsQueryable();
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(e => e.TaskName.Contains(search));
+            }
+            switch (sortBy)
+            {
+                case "taskName":
+                    query = order == "ascending"
+                        ? query.OrderBy(e => e.TaskName)
+                        : query.OrderByDescending(e => e.TaskName);
+                    break;
+                case "taskStatus":
+                    query = order == "ascending"
+                        ? query.OrderBy(e => e.TaskStatus)
+                        : query.OrderByDescending(e => e.TaskStatus);
+                    break;
+                default:
+                    query = query.OrderBy(e => e.id);
+                    break;
+            }
+            var totalCount = await query.CountAsync();
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+            var tasks = await query.ToListAsync();
+            return Ok(new
+            {
+                Status = "Success",
+                Data = tasks,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                Message = "Tasks retrieved successfully!"
+            });
         }
 
         [HttpGet("{id}")]
