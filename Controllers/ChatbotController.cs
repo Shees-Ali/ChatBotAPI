@@ -67,7 +67,7 @@ namespace ChatBotAPI.Controllers
         [Route("conversation")]
         public async Task<IActionResult> OpenAIChat(List<MessageItem> messages)
         {
-            string apiKey = "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";
+            string apiKey = _configuration["OpenAI:ApiKey"];
             var client = new OpenAIClient(apiKey, new OpenAIClientOptions());
             var deploymentOrModelName = "gpt-3.5-turbo";
 
