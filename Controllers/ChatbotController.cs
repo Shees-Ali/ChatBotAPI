@@ -4,10 +4,12 @@ using Azure.AI.TextAnalytics;
 using Azure.AI.Language.QuestionAnswering;
 using Azure.AI.OpenAI;
 using ChatBotAPI.Models;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
 
 namespace ChatBotAPI.Controllers
 {
-    [Route("api/chat")]
+    [Route("api/ai")]
     [ApiController]
     public class ChatbotController : ControllerBase
     {
@@ -22,27 +24,7 @@ namespace ChatBotAPI.Controllers
             this._configuration = configuration;
         }
 
-        [HttpGet]
-        [Route("analyze")]
-        public async Task<IActionResult> TextSummarizationExample()
-        {
-            string document = @"The extractive summarization feature in Text Analytics uses natural language processing techniques to locate key sentences in an unstructured text document. 
-                These sentences collectively convey the main idea of the document. This feature is provided as an API for developers. 
-                They can use it to build intelligent solutions based on the relevant information extracted to support various use cases. 
-                In the public preview, extractive summarization supports several languages. It is based on pretrained multilingual transformer models, part of our quest for holistic representations. 
-                It draws its strength from transfer learning across monolingual and harness the shared nature of languages to produce models of improved quality and efficiency.";
-
-            var batchInput = new List<string>
-            {
-                document
-            };
-            var result = await client.AbstractiveSummarizeAsync(WaitUntil.Completed, batchInput);
-            var analysis = await client.AnalyzeSentimentAsync(document);
-            var _result = await client.RecognizeEntitiesAsync(document);
-            return Ok(new { Status = "Success", SummaryResponse = result, AnalysisResponse = analysis, EnitityRecognitionResult = _result });
-        }
-
-        [HttpGet]
+        /* [HttpGet]
         [Route("start")]
         public async Task<IActionResult> ChatWithQuestionsAnswering(string question)
         {
@@ -60,6 +42,32 @@ namespace ChatBotAPI.Controllers
             }
 
             return Ok(response);
+        }*/
+
+        [HttpGet]
+        [Route("getTags")]
+        public async Task<IActionResult> getTagsForDescription(string description)
+        {
+            var _result = await client.RecognizeEntitiesAsync(description);
+
+            return Ok(new
+            {
+                Status = "Success",
+                EnitityRecognitionResult = _result
+            });
+        }
+
+        [HttpGet]
+        [Route("summarize")]
+        public async Task<IActionResult> summarizeDescription(string description)
+        {
+            var batchInput = new List<string>
+            {
+                description
+            };
+            var result = await client.AbstractiveSummarizeAsync(WaitUntil.Completed, batchInput);
+            return Ok(new { Status = "Success", SummaryResponse = result });
+
         }
 
         // Main chat function that will be used for communication with OpenAI
