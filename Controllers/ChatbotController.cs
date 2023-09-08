@@ -65,7 +65,7 @@ namespace ChatBotAPI.Controllers
             {
                 description
             };
-            var result = await client.AbstractiveSummarizeAsync(WaitUntil.Completed, batchInput);
+            var result = await client.ExtractiveSummarizeAsync(WaitUntil.Completed, batchInput);
             return Ok(new { Status = "Success", SummaryResponse = result });
 
         }
