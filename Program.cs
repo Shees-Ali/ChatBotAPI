@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:4200", "https://taskmanager-chatbot.netlify.app").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                          policy.WithOrigins("http://localhost:4200", "https://taskmanager-chatbot.netlify.app", "https://chatbot-meta.netlify.app").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                       });
 });
 
