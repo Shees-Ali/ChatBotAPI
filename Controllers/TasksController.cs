@@ -71,7 +71,7 @@ namespace ChatBotAPI.Controllers
         [ActionName("GetByID")]
         public async Task<IActionResult> GetByID(int id)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(x => x.id == id);
+            var task = await _context.Tasks.Include(e => e.User).FirstOrDefaultAsync(x => x.id == id);
             if (task != null)
             {
                 return Ok(new { Status = "Success", Data = task, Message = "Task Found !" });
