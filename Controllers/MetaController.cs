@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ChatBotAPI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net;
@@ -9,6 +10,11 @@ namespace ChatBotAPI.Controllers
     [ApiController]
     public class MetaController : ControllerBase
     {
+        private readonly GraphAPIService graphAPI;
+        public MetaController([FromServices] GraphAPIService _graphAPI)
+        {
+            this.graphAPI = _graphAPI;
+        }
 
         [HttpGet]
         [Route("")]
@@ -32,6 +38,14 @@ namespace ChatBotAPI.Controllers
                 Content = new StringContent("Forbidden")
             };
             return NotFound(response);
+        }
+
+        [HttpGet]
+        [Route("testService")]
+        public async Task<IActionResult> testService()
+        {
+            var _string = graphAPI.DoSomething();
+            return Ok(_string);
         }
     }
 }
