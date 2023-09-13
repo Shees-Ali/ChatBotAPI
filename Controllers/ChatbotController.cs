@@ -19,7 +19,7 @@ namespace ChatBotAPI.Controllers
         readonly private QuestionAnsweringClient questionClient = new QuestionAnsweringClient(endpoint, credential);
         private readonly IConfiguration _configuration;
 
-        public ChatbotController([FromServices] IConfiguration configuration)
+        public ChatbotController(IConfiguration configuration)
         {
             this._configuration = configuration;
         }

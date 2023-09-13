@@ -1,77 +1,8 @@
-﻿using Azure.AI.OpenAI;
-using ChatBotAPI.Models;
+﻿using ChatBotAPI.Models;
 using ChatBotAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
-
-public class Entry
-{
-    public string id { get; set; }
-    public long time { get; set; }
-    public List<Messaging> messaging { get; set; }
-}
-
-public class Message
-{
-    public string mid { get; set; }
-    public string text { get; set; }
-    public Tags tags { get; set; }
-}
-
-public class Messaging
-{
-    public Sender sender { get; set; }
-    public Recipient recipient { get; set; }
-    public long timestamp { get; set; }
-    public Message message { get; set; }
-}
-
-public class Recipient
-{
-    public string id { get; set; }
-}
-
-public class Root
-{
-    public string @object { get; set; }
-    public List<Entry> entry { get; set; }
-}
-
-public class Sender
-{
-    public string id { get; set; }
-}
-
-public class Tags
-{
-    public string source { get; set; }
-}
-
-/*{
-    "entry": [
-      {
-        "time": 1520383571,
-      "changes": [
-        {
-            "field": "photos",
-          "value":
-            {
-                "verb": "update",
-              "object_id": "10211885744794461"
-            }
-        }
-      ],
-      "id": "10210299214172187",
-      "uid": "10210299214172187"
-      }
-  ],
-  "object": "user"
-}*/
-
 
 [ApiController]
 [Route("")]
@@ -79,11 +10,12 @@ public class WebhookController : ControllerBase
 {
     private readonly ILogger<WebhookController> _logger;
     private readonly AIResponseService aIResponseService;
-
-    public WebhookController(ILogger<WebhookController> logger, [FromServices] AIResponseService _aIResponseService)
+    private readonly GraphAPIService graphAPIService;
+    public WebhookController(ILogger<WebhookController> logger, AIResponseService _aIResponseService, GraphAPIService _graphAPIService)
     {
         _logger = logger;
         aIResponseService = _aIResponseService;
+        graphAPIService = _graphAPIService;
     }
 
     [HttpGet]
@@ -112,7 +44,7 @@ public class WebhookController : ControllerBase
     {
         Console.WriteLine("WEBHOOK_RECEIVED");
         Console.WriteLine($"{json.ToString()}");
-        Root message = json.Deserialize<Root>();
+        MetaMessageResponse message = json.Deserialize<MetaMessageResponse>();
         Console.WriteLine(message?.entry[0].messaging[0].message.text);
         // goes to gpt service gets message response
         List<MessageItem> messages = new List<MessageItem> { };
@@ -121,11 +53,13 @@ public class WebhookController : ControllerBase
             Message = message?.entry[0].messaging[0].message.text,
             Role = "User"
         });
-        var _message = await aIResponseService.getMessage(messages);
-        Console.WriteLine(_message);
-        //
-
+        var model_response = await aIResponseService.GetMessage(messages);
+        Console.WriteLine(model_response);
+        Console.WriteLine(message.entry[0].messaging[0].sender.id);
         // calls graphAPIservice to send the message
+        var api_response = await graphAPIService.SendMessage(model_response, message.entry[0].messaging[0].sender.id);
+        Console.WriteLine("API_RESPONSE_RECEIVED");
+        Console.WriteLine(api_response.MessageId);
         return Ok(json);
     }
 }
