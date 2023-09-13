@@ -29,6 +29,7 @@ builder.Services.AddScoped<UserManager<IdentityUser>>();
 builder.Services.AddTransient<ChatbotController>();
 builder.Services.AddTransient<AuthenticationController>();
 builder.Services.AddTransient<GraphAPIService>();
+builder.Services.AddSingleton<AIResponseService>();
 
 // Init the Database Service
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
